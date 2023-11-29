@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e -u
+#cp -a tests "${AUTOPKGTEST_TMP}"
+
+for py3vers in $(py3versions -s); do
+    echo
+    echo "***************************"
+    echo "*** Testing with ${py3vers}"
+    echo "***************************"
+    echo
+    cd ${AUTOPKGTEST_TMP} && \
+        echo "Simple smoking test by trying to import the 'cmarkgfm' module..."
+        ${py3vers} -c 'import cmarkgfm; print(cmarkgfm)'
+done
+
+echo
+
+exit 0

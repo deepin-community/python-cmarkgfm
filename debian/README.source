@@ -1,0 +1,61 @@
+Package maintenance
+-------------------
+
+This package is maintained with git-buildpackage(1). It follows DEP-14
+for branch naming (e.g. using debian/master for the current version
+in Debian unstable).
+
+It uses pristine-tar(1) to store enough information in git to generate
+bit identical tarballs when building the package without having
+downloaded an upstream tarball first.
+
+When working with patches it is recommended to use "gbp pq import" to
+import the patches, modify the source and then use "gbp pq export
+--commit" to commit the modifications.
+
+The changelog is generated using "gbp dch" so if you submit any
+changes don't bother to add changelog entries but rather provide
+a nice git commit message that can then end up in the changelog.
+
+It is recommended to build the package with pbuilder using:
+
+    gbp buildpackage --git-pbuilder
+
+For information on how to set up a pbuilder environment see the
+git-pbuilder(1) manpage. In short:
+
+    DIST=sid git-pbuilder create
+    gbp clone https://salsa.debian.org/python-team/packages/python-cmarkgfm.git
+    cd python-cmarkgfm
+    gbp buildpackage --git-pbuilder
+
+Remarks about Upstream Tarball to import
+----------------------------------------
+
+Upstream uses a Git submodule to include the required source of cmarkgfm.
+So it's not enough to just pick up a tagged upstream release and to import
+the resulting tarball into the packaging tree.
+Currently we need to have the depending source for cmarkgfm included within
+the tarball to import within the folder 'third_party/cmark/'.
+
+A possible way to get this done is to clone the upstream tree and later init
+and clone the submodule.
+
+  $ git clone https://github.com/theacodes/cmarkgfm.git
+    Cloning into 'cmarkgfm'...
+    remote: Enumerating objects: 362, done.
+    remote: Counting objects: 100% (118/118), done.
+    remote: Compressing objects: 100% (70/70), done.
+    remote: Total 362 (delta 55), reused 85 (delta 34), pack-reused 244
+    Receiving objects: 100% (362/362), 63.89 KiB | 3.36 MiB/s, done.
+    Resolving deltas: 100% (181/181), done.
+  $ cd cmarkgfm/
+  $ git submodule init 
+    Submodule 'third_party/cmark' (https://github.com/github/cmark) registered for path 'third_party/cmark'
+  $ git submodule update 
+    Cloning into '/home/carsten/Downloads/tmp/cmarkgfm/third_party/cmark'...
+    Submodule path 'third_party/cmark': checked out 'cf7577d2f74289cb83de0a652afc1a8b08a37036'
+  $ cd ..
+  $ tar cfz python-cmarkgfm_0.7.0.tar.gz --exclude=.git cmarkgfm/
+
+ -- Carsten Schoenert <c.schoenert@t-online.de>  Mon, 07 Mar 2022 12:13:00 +0100
